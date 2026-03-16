@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Argus | Cost Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='calculator.css') }}" />
+</head>
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <img
+                    src="{{ url_for('static', filename='images/argus-logo.png') }}"
+                    alt="Argus Logo"
+                    class="brand-logo"
+                />
+                <div class="brand-text">
+                    <h1>Argus</h1>
+                    <p>Automated Recognition and Group Understanding System - Cost calculator </p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a class="nav-btn" href="{{ url_for('index') }}">Back to Detection</a>
+                <span class="topbar-badge">Veriff Take Home Assignment - Data Scientist </span>
+            </div>
+        </header>
+
+        <section class="hero-grid">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Scenario Inputs</h2>
+                    <p>
+                        Adjust the assumptions, choose one or more models, and compare
+                        compute cost, fraud-loss cost, and fixed annual license cost.
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ url_for('calculator') }}">
+                    <div class="calculator-grid">
+                        <div class="field">
+                            <label for="item_type">Input Type</label>
+                            <select id="item_type" name="item_type">
+                                <option value="video" {% if form.item_type == 'video' %}selected{% endif %}>Videos</option>
+                                <option value="image" {% if form.item_type == 'image' %}selected{% endif %}>Images</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="num_items">Number of Items</label>
+                            <input id="num_items" name="num_items" type="number" min="1" value="{{ form.num_items }}" />
+                        </div>
+
+                        <div class="field">
+                            <label for="duration_sec">Duration per Video (sec)</label>
+                            <input id="duration_sec" name="duration_sec" type="number" min="0" step="0.1" value="{{ form.duration_sec }}" />
+                        </div>
+
+                        <div class="field">
+                            <label for="sample_fps">Sample FPS</label>
+                            <input id="sample_fps" name="sample_fps" type="number" min="0.1" step="0.1" value="{{ form.sample_fps }}" />
+                        </div>
+
+                        <div class="field">
+                            <label for="fraud_rate_pct">Fraud Rate (%)</label>
+                            <input id="fraud_rate_pct" name="fraud_rate_pct" type="number" min="0" max="100" step="0.1" value="{{ form.fraud_rate_pct }}" />
+                        </div>
+
+                        <div class="field">
+                            <label for="fraud_cost_usd">Fraud Cost per Miss (USD)</label>
+                            <input id="fraud_cost_usd" name="fraud_cost_usd" type="number" min="0" step="0.01" value="{{ form.fraud_cost_usd }}" />
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <label class="group-label">Models to Compare</label>
+                        <div class="checkbox-grid">
+                            {% for model in models %}
+                            <label class="checkbox-card">
+                                <input
+                                    type="checkbox"
+                                    name="models"
+                                    value="{{ model.key }}"
+                                    {% if model.key in form.selected_models %}checked{% endif %}
+                                />
+                                <span>{{ model.label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <label class="group-label">Model Assumptions</label>
+                        <div class="model-config-list">
+                            {% for model in models %}
+                            <div class="model-config-card">
+                                <h3>{{ model.label }}</h3>
+
+                                <div class="small-input-grid">
+                                    <div class="field">
+                                        <label for="recall_{{ model.key }}">Recall on multi-person</label>
+                                        <input
+                                            id="recall_{{ model.key }}"
+                                            name="recall_{{ model.key }}"
+                                            type="number"
+                                            min="0"
+                                            max="1"
+                                            step="0.01"
+                                            value="{{ model.recall_multi }}"
+                                        />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="throughput_{{ model.key }}">Throughput (FPS)</label>
+                                        <input
+                                            id="throughput_{{ model.key }}"
+                                            name="throughput_{{ model.key }}"
+                                            type="number"
+                                            min="0.01"
+                                            step="0.01"
+                                            value="{{ model.throughput_fps }}"
+                                        />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="hourly_cost_{{ model.key }}">Infra Cost / Hour (USD)</label>
+                                        <input
+                                            id="hourly_cost_{{ model.key }}"
+                                            name="hourly_cost_{{ model.key }}"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value="{{ model.hourly_cost_usd }}"
+                                        />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="license_{{ model.key }}">Fixed Annual License Cost (USD)</label>
+                                        <input
+                                            id="license_{{ model.key }}"
+                                            name="license_{{ model.key }}"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value="{{ model.annual_license_usd }}"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit">Run Calculator</button>
+                    </div>
+                </form>
+            </section>
+
+            <aside class="panel info-panel">
+                <div class="info-top">
+                    <span class="mini-label">Default Scenario</span>
+                    <h2>Starter assumptions</h2>
+                    <p>
+                        The default setup uses 10,000 videos, 15 seconds each,
+                        1 sampled frame per second, 5% fraud rate, and $500 fraud cost
+                        per missed case.
+                    </p>
+                </div>
+
+                <div class="log-section">
+                    <p class="log-desc">
+                        Default fixed costs are set to YOLOv10 = $10,000, YOLOv8 = $5,000,
+                        and HOG + SVM = $0, and you can edit those values directly here.
+                    </p>
+                    <a class="log-btn" href="{{ url_for('index') }}">Open Detection Page</a>
+                </div>
+            </aside>
+        </section>
+
+        {% if results %}
+        <section class="panel results-panel">
+            <div class="results-header">
+                <h2>Cost Results</h2>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Recall</th>
+                            <th>Total sampled frames</th>
+                            <th>Compute hours</th>
+                            <th>Compute cost</th>
+                            <th>Fraud loss</th>
+                            <th>Fixed license cost</th>
+                            <th>Total cost</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results %}
+                        <tr>
+                            <td>{{ row.model_label }}</td>
+                            <td>{{ "%.2f"|format(row.recall_multi) }}</td>
+                            <td>{{ "%.0f"|format(row.total_sampled_frames) }}</td>
+                            <td>{{ "%.3f"|format(row.compute_hours) }}</td>
+                            <td>${{ "%.2f"|format(row.compute_cost_usd) }}</td>
+                            <td>${{ "%.2f"|format(row.fraud_loss_usd) }}</td>
+                            <td>${{ "%.2f"|format(row.annual_license_usd) }}</td>
+                            <td>${{ "%.2f"|format(row.total_cost_usd) }}</td>
+                            <td>
+                                {% if row.model_key == best_model_key %}
+                                    <span class="badge single">Best choice</span>
+                                {% else %}
+                                    <span class="badge multi">Compared</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

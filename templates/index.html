@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Argus </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <img
+                    src="{{ url_for('static', filename='images/argus-logo.png') }}"
+                    alt="Argus Logo"
+                    class="brand-logo"
+                />
+                <div class="brand-text">
+                    <h1>Argus</h1>
+                    <p>Automated Recognition and Group Understanding System</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a class="nav-btn" href="{{ url_for('calculator') }}">Open Calculator</a>
+                <span class="topbar-badge">Veriff Take Home Assignment - Data Scientist </span>
+            </div>
+        </header>
+
+        {% if error %}
+        <div class="alert error">{{ error }}</div>
+        {% endif %}
+
+        <section class="hero-grid">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Upload Videos</h2>
+                    <p>Drag & drop, or browse files.</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="method">Detection Method</label>
+                            <select id="method" name="method">
+                                <option value="yolov10" {% if selected_method == 'yolov10' %}selected{% endif %}>YOLOv10</option>
+                                <option value="yolov8" {% if selected_method == 'yolov8' %}selected{% endif %}>YOLOv8</option>
+                                <option value="hog_svm" {% if selected_method == 'hog_svm' %}selected{% endif %}>HOG + SVM</option>
+                                <option value="all" {% if selected_method == 'all' %}selected{% endif %}>All Methods</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="dropzone" id="dropzone">
+                        <input
+                            class="dropzone-input"
+                            type="file"
+                            id="videos"
+                            name="videos"
+                            accept=".mp4,.mov,.avi,.mkv,.mpeg,.mpg,.webm"
+                            multiple
+                        />
+                        <div class="dropzone-content">
+                            <div class="dropzone-icon">↑</div>
+                            <div class="drop-title">Drop videos here</div>
+                            <div class="drop-subtitle">
+                                Or click to browse. Supported formats: MP4, MOV, AVI, MKV, MPEG, MPG, WEBM.
+                            </div>
+                            <div class="file-status" id="file-status">No files selected yet.</div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit">Analyze Videos</button>
+                    </div>
+                </form>
+            </section>
+
+            <aside class="panel info-panel">
+                <div class="info-top">
+                    <span class="mini-label">How it works</span>
+                    <h2>What Argus does</h2>
+                    <p>
+                        Upload one or more videos, choose a detection method, and Argus will
+                        classify each video based on whether it contains one person or more
+                        than one person.
+                    </p>
+                </div>
+
+                <div class="log-section">
+                    <p class="log-desc">You can also open the calculator page to compare fraud-loss and compute-cost assumptions across models before deciding which model to deploy.</p>
+                    <a class="log-btn" href="{{ url_for('calculator') }}">Go to Calculator</a>
+                </div>
+            </aside>
+        </section>
+
+        {% if results %}
+        <section class="panel results-panel">
+            <div class="results-header">
+                <h2>Results</h2>
+                <div class="results-actions">
+                    {% if logfile %}
+                    <a class="log-btn" href="{{ url_for('download_log', filename=logfile) }}">Download Log CSV</a>
+                    {% endif %}
+                    {% if processingfile %}
+                    <a class="log-btn" href="{{ url_for('download_processing', filename=processingfile) }}">Download Processing ZIP</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Video</th>
+                            <th>Method</th>
+                            <th>Classification</th>
+                            <th>Max persons</th>
+                            <th>Frames with 2+</th>
+                            <th>Frames processed</th>
+                            <th>Duration (s)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results %}
+                        <tr>
+                            <td>{{ row.filename }}</td>
+                            <td>{{ row.method }}</td>
+                            <td>
+                                {% if row.error %}
+                                    -
+                                {% elif row.classification == "Single Person" %}
+                                    <span class="badge single">{{ row.classification }}</span>
+                                {% else %}
+                                    <span class="badge multi">{{ row.classification }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.max_person_count if row.max_person_count is defined else '-' }}</td>
+                            <td>{{ row.frames_with_multiple_people if row.frames_with_multiple_people is defined else '-' }}</td>
+                            <td>{{ row.frames_processed if row.frames_processed is defined else '-' }}</td>
+                            <td>{{ row.duration_sec if row.duration_sec is defined else '-' }}</td>
+                            <td>
+                                {% if row.error %}
+                                    <span class="text-error">{{ row.error }}</span>
+                                {% else %}
+                                    Done
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

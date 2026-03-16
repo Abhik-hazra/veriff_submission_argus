@@ -1,0 +1,1 @@
+# Empty file to mark detectors as a package.
