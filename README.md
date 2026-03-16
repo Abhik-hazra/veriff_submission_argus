@@ -1,4 +1,4 @@
-# Argus – Automated Recognition and Group Understanding System (App for Veriff Take-Home test)
+# Argus – Automated Recognition and Group Understanding System (Flask-based App for Veriff Take-Home test)
 
 Argus is a small prototype application built as part of the Veriff Fraud Data Scientist take-home Assessment.
 
