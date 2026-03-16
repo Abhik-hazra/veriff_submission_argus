@@ -10,6 +10,8 @@ The presence of multiple people in a verification video can be a potential fraud
 
 It is part of the integration solution and cost analysis of different Image Models. 
 
+![Argus working](https://github.com/user-attachments/assets/bc52b4bc-c650-4d0b-ad40-ebcd03d0528c)
+
 # What Argus Can Do
 
 Argus provides a simple interface for testing and evaluating different person-detection approaches.
