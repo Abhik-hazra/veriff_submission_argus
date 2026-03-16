@@ -1,0 +1,113 @@
+Instructions to Run the Code
+============================
+
+1. Clone the repository
+
+   git clone https://github.com/Abhik-hazra/veriff_submission_argus.git
+   cd veriff_submission_argus
+
+2. Check the project structure
+
+   Make sure the project contains these files and folders:
+
+   app.py
+   requirements.txt
+   detectors/
+   templates/
+   static/
+   uploads/
+
+   Inside detectors/:
+   __init__.py
+   base.py
+   registry.py
+   hog_svm_detector.py
+   yolov8_detector.py
+   yolov10_detector.py
+
+   Inside templates/:
+   index.html
+   calculator.html
+
+   Inside static/:
+   style.css
+   calculator.css
+   app.js
+
+   If uploads/ does not already exist, the app will create:
+   uploads/videos/
+   uploads/processing/
+   uploads/generated/
+
+3. Create a virtual environment
+
+   On macOS / Linux:
+   python3 -m venv .venv
+
+   On Windows:
+   python -m venv .venv
+
+4. Activate the virtual environment
+
+   On macOS / Linux:
+   source .venv/bin/activate
+
+   On Windows PowerShell:
+   .\.venv\Scripts\Activate.ps1
+
+   On Windows Command Prompt:
+   .venv\Scripts\activate.bat
+
+5. Install the required dependencies
+
+   pip install -r requirements.txt
+
+6. Run the app
+
+   On macOS / Linux:
+   python3 app.py
+
+   On Windows:
+   python app.py
+
+7. Open the app in the browser
+
+   Home page:
+   http://127.0.0.1:5000/
+
+   Calculator page:
+   http://127.0.0.1:5000/calculator
+
+8. Use the app
+
+   Upload one or more supported video files.
+   Choose a detection method: YOLOv10, YOLOv8, HOG + SVM, or All.
+   Run the analysis and review the results table.
+   Download the generated CSV log and processing ZIP if needed.
+
+Output
+------
+
+After execution, the app can generate:
+
+   uploads/generated/analysis_log_<id>.csv
+   uploads/generated/processing_steps_<id>.zip
+
+Additional Notes
+----------------
+
+- Supported video formats are: mp4, mov, avi, mkv, mpeg, mpg, webm.
+- The app classifies each video as Single Person or Multiple People.
+- The calculator page compares YOLOv10, YOLOv8, and HOG + SVM using cost assumptions.
+- If some files are currently named like base-2.py or index-14.html, rename them to their final names before running the app.
+
+Quick Summary
+-------------
+
+Clone the repository, create and activate a virtual environment, install the requirements, and run:
+
+   python app.py
+
+If you are on macOS / Linux, you may use:
+
+   python3 app.py
