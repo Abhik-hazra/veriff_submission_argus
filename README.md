@@ -1,14 +1,14 @@
-# Argus – Automated Recognition and Group Understanding System
+# Argus – Automated Recognition and Group Understanding System (App for Veriff Take-Home test)
 
-Argus is a small prototype application built as part of the Veriff Fraud Data Scientist take-home assignment.
+Argus is a small prototype application built as part of the Veriff Fraud Data Scientist take-home Assessment.
 
 It demonstrates how a person-detection pipeline can be integrated into a simple operational tool to detect whether a verification video contains:
 
-Single Person
-
-Multiple People
+Single Person or Multiple People
 
 The presence of multiple people in a verification video can be a potential fraud signal, and this tool shows how such detection can be automated and evaluated.
+
+It is part of the integration solution and cost analysis of different Image Models. 
 
 # What Argus Can Do
 
